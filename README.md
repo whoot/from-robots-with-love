@@ -11,7 +11,7 @@ For best results:
 - Look into the [dirsearch documentation](https://github.com/maurosoria/dirsearch?tab=readme-ov-file#options) and select more parameters according to your needs.
 
 ### Basic usage
-Since the list contains one entry per line it is optimized for recursion (e.g. with maximum depth of 3):
+Since the wordlist contains one entry per line, it is optimized for recursive scanning (shown here with a maximum depth of 3):
 ```
 python3 dirsearch.py --random-agent -u https://target.com -w trust-me-im-a-robot.txt --recursive -R 3
 ```
