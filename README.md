@@ -1,14 +1,16 @@
 # Trust Me Im A Robot
-A [dirsearch](https://github.com/maurosoria/dirsearch) optimized wordlist scraped from the [top 100k most visited domains](https://radar.cloudflare.com/domains).
+A [Burp Professional](https://portswigger.net/burp/pro) and [dirsearch](https://github.com/maurosoria/dirsearch) optimized wordlist scraped from the [top 100k most visited domains](https://radar.cloudflare.com/domains).
+
+The `dirsearch-robot` wordlist is optimized for use with dirsearch, especially its extension handling and case transformation features. \
+As Burp’s Content Discovery feature requires separate lists for files and directories, the original wordlist was split accordingly into `burp-robot-files` and `burp-robot-directories`. The underlying content remains the same.
 
 ## Usage
-The wordlist is optimized for use with dirsearch, especially its extension handling and case transformation features.
 
 For best results:
 - Choose extensions based on the target stack to avoid testing unnecessary file types.
 - Use recursion for deeper discovery.
 - Adjust case transformations depending on the target environment.
-- Look into the [dirsearch documentation](https://github.com/maurosoria/dirsearch?tab=readme-ov-file#options) and select more parameters according to your needs.
+- Look into the [dirsearch](https://github.com/maurosoria/dirsearch?tab=readme-ov-file#options) and [Burp](https://portswigger.net/burp/documentation/desktop/tools/engagement-tools/content-discovery) documentation and select more parameters according to your needs.
 
 ### Basic usage
 Since the wordlist contains one entry per line, it is optimized for recursive scanning (shown here with a maximum depth of 3):
