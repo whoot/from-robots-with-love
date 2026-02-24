@@ -1,8 +1,8 @@
 # Trust Me Im A Robot
-A [Burp Professional](https://portswigger.net/burp/pro) and [dirsearch](https://github.com/maurosoria/dirsearch) optimized wordlist scraped from the [top 100k most visited domains](https://radar.cloudflare.com/domains).
+A [Burp Professional](https://portswigger.net/burp/pro) and [dirsearch](https://github.com/maurosoria/dirsearch) optimized wordlist scraped from the `/robots.txt` of the [top 100k most visited domains](https://radar.cloudflare.com/domains).
 
-The `dirsearch-robot` wordlist is optimized for use with dirsearch, especially its extension handling and case transformation features. \
-As Burp’s Content Discovery feature requires separate lists for files and directories, the original wordlist was split accordingly into `burp-robot-files` and `burp-robot-directories`. The underlying content remains the same.
+The `dirsearch-robots` wordlist is optimized for use with dirsearch, especially its extension handling and case transformation features. \
+As Burp’s Content Discovery feature requires separate lists for files and directories, the original wordlist was split accordingly into `burp-robots-files` and `burp-robots-directories`. The underlying content remains the same.
 
 ## Usage
 
@@ -15,7 +15,7 @@ For best results:
 ### Basic usage
 Since the wordlist contains one entry per line, it is optimized for recursive scanning (shown here with a maximum depth of 3):
 ```
-python3 dirsearch.py --random-agent -u https://target.com -w trust-me-im-a-robot.txt --recursive -R 3
+python3 dirsearch.py --random-agent -u https://target.com -w dirsearch-robots.txt --recursive -R 3
 ```
 
 ### Using extensions (recommended)
@@ -24,7 +24,7 @@ The wordlist uses generic entries and `%EXT%` placeholders where applicable.
 You should define relevant extensions depending on the target technology.
 ```
 python3 dirsearch.py --random-agent -u https://target.com \
-  -w trust-me-im-a-robot.txt \
+  -w dirsearch-robots.txt \
   --recursive -R 3 \
   -e php,html
 ```
@@ -37,7 +37,7 @@ The wordlist is primarily lowercase.
 You can let dirsearch handle case variations automatically:
 ```
 python3 dirsearch.py -u https://target.com \
-  -w trust-me-im-a-robot.txt \
+  -w dirsearch-robots.txt \
   --recursive -R 3 \
   -e php \
   --capital
