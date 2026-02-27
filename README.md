@@ -1,41 +1,45 @@
-# Trust Me Im A Robot
-A [Burp Professional](https://portswigger.net/burp/pro) and [dirsearch](https://github.com/maurosoria/dirsearch) optimized wordlist scraped from the `/robots.txt` of the [top 100k most visited domains](https://radar.cloudflare.com/domains).
+# From Robots With Love
 
-The `dirsearch-robots` wordlist is optimized for use with dirsearch, especially its extension handling and case transformation features. \
-As Burp’s Content Discovery feature requires separate lists for files and directories, the original wordlist was split accordingly into `burp-robots-files` and `burp-robots-directories`. The underlying content remains the same.
+A [Burp Professional](https://portswigger.net/burp/pro) and [dirsearch](https://github.com/maurosoria/dirsearch) optimized wordlist for content discovery, built by scraping and analyzing `/robots.txt` from the [top 100k most visited domains](https://radar.cloudflare.com/domains) in February 2026.
+
+## Wordlists
+
+| File | Tool | Description |
+|------|------|-------------|
+| `dirsearch-robots.txt` | dirsearch | Combined wordlist with `%EXT%` placeholders for dirsearch's extension handling |
+| `burp-robots-files.txt` | Burp Suite | Files only (required by Burp's Content Discovery) |
+| `burp-robots-directories.txt` | Burp Suite | Directories only (required by Burp's Content Discovery) |
+
+The underlying content is the same - the Burp lists are simply the dirsearch list split into files and directories.
 
 ## Usage
 
-For best results:
-- Choose extensions based on the target stack to avoid testing unnecessary file types.
-- Use recursion for deeper discovery.
-- Adjust case transformations depending on the target environment.
-- Look into the [dirsearch](https://github.com/maurosoria/dirsearch?tab=readme-ov-file#options) and [Burp](https://portswigger.net/burp/documentation/desktop/tools/engagement-tools/content-discovery) documentation and select more parameters according to your needs.
-
 ### Basic usage
-Since the wordlist contains one entry per line, it is optimized for recursive scanning (shown here with a maximum depth of 3):
-```
-python3 dirsearch.py --random-agent -u https://target.com -w dirsearch-robots.txt --recursive -R 3
+
+The wordlist contains one entry per line and is optimized for recursive scanning:
+
+```bash
+python3 dirsearch.py --random-agent -u https://target.com \
+  -w dirsearch-robots.txt \
+  --recursive -R 3
 ```
 
 ### Using extensions (recommended)
 
-The wordlist uses generic entries and `%EXT%` placeholders where applicable.
-You should define relevant extensions depending on the target technology.
-```
+The wordlist uses `%EXT%` placeholders for server-side files. Define extensions based on the target stack to keep scans efficient and avoid testing irrelevant file types:
+
+```bash
 python3 dirsearch.py --random-agent -u https://target.com \
   -w dirsearch-robots.txt \
   --recursive -R 3 \
   -e php,html
 ```
 
-This avoids testing irrelevant file types and keeps scans efficient.
-
 ### Case variations
 
-The wordlist is primarily lowercase.
-You can let dirsearch handle case variations automatically:
-```
+The wordlist is primarily lowercase. Let dirsearch handle case transformations automatically:
+
+```bash
 python3 dirsearch.py -u https://target.com \
   -w dirsearch-robots.txt \
   --recursive -R 3 \
@@ -43,37 +47,43 @@ python3 dirsearch.py -u https://target.com \
   --capital
 ```
 
-## Why
-In pentests, a common question is: *Which wordlist(s) should I use for (hidden) content discovery?* \
-For many testers, the first choice is probably [SecLists / Discovery / Web-Content](https://github.com/danielmiessler/SecLists/tree/master/Discovery/Web-Content). \
-However, many of the wordlists included there have certain limitations that can lead to practical challenges during testing:
+### Tips
 
-- Modern software and current technologies are often not adequately represented, as some wordlists are already 3 to 9 years old.
-- Multiple wordlists contain identical or very similar entries (like `file.php`, `file.html`, `file.json`, ...) so you will always test files that are unlikely to exist (e.g. PHP files on non-PHP applications).
-- The same paths/files are tested multiple times across different wordlists.
-- Some lists include static content that may not be relevant (e.g. JavaScript files) or contain, let’s say, 'unwanted' entries (looking at you, `raft-*.txt`!).
+- Choose extensions based on the target stack to avoid unnecessary requests.
+- Adjust case transformations depending on the target environment.
+- Use recursion for deeper discovery.
+- Refer to the [dirsearch](https://github.com/maurosoria/dirsearch?tab=readme-ov-file#options) and [Burp](https://portswigger.net/burp/documentation/desktop/tools/engagement-tools/content-discovery) documentation for additional tuning options.
+
+## Motivation
+
+In pentests, a common question is: *Which wordlist should I use for content discovery?*
+
+For many testers, the go-to choice is [SecLists / Discovery / Web-Content](https://github.com/danielmiessler/SecLists/tree/master/Discovery/Web-Content). However, many of those wordlists come with practical limitations:
+
+- **Outdated coverage** - some lists are 3-9 years old and don't reflect modern applications and technologies.
+- **Redundant extensions** - entries like `file.php`, `file.html`, `file.json` test the same path with every extension, most of which won't exist on the target.
+- **Overlap between lists** - the same paths appear across multiple wordlists, leading to duplicate requests.
+- **Noisy entries** - static assets (e.g. JavaScript files) and questionable entries (looking at you, `raft-*.txt`) add bulk without value.
 
 The result is unnecessary requests, increased brute-force time, and less focused testing.
 
 ## Approach
-I wanted to address this by creating a universal and relatively compact wordlist that contains the most common directories and files while leveraging dirsearch’s built-in functionality.
 
-- Crawl the top 100,000 most visited domains and collect `/robots.txt` entries.
-- Parse, normalize, and filter the extracted paths.
-- Sort entries based on frequency of occurrence.
-- Selectively include still relevant entries from SecLists.
-- Keep the list clean, focused, and optimized for modern content discovery.
+This project aims to create a universal and (relatively) compact wordlist that captures the most common directories and files while leveraging dirsearch's built-in features.
 
+1. Crawl `/robots.txt` from the top 100,000 most visited domains.
+2. Extract and clean paths from `Disallow`/`Allow` directives.
+3. Remove noise (see below).
+4. Sort entries by frequency of occurrence across domains.
 
 ### Filtering
 
-To improve usability and reduce noise, the dataset was cleaned by removing entries that are typically not useful for content discovery, including:
+To reduce noise and improve scan efficiency, the following categories are removed:
 
 - Sex-related terms
-- Language-specific words (except English and German)
-- Website-specific or highly contextual paths
-- Language codes
-- Country and city names
-- Brand names
-- Static content (primarily JavaScript files)
-- Other entries that do not meaningfully contribute to discovery
+- Non-English/German language-specific words
+- Site-specific or highly contextual paths (e.g. product filter URLs from individual shops)
+- Language and country codes
+- City and brand names
+- Static content (JavaScript files, images, fonts, etc.)
+- Entries that don't meaningfully contribute to discovery
