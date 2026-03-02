@@ -252,7 +252,6 @@ viewforum.%EXT%
 socket.io
 shop.%EXT%
 selected-flights.%EXT%
-search.jhtml
 proxy.%EXT%
 pm.%EXT%
 payments.%EXT%
@@ -262,8 +261,13 @@ groupcp.%EXT%
 group.%EXT%
 feed.xml
 feed.%EXT%
+administrator.%EXT%
+logon.%EXT%
+webeditor.%EXT%
+openapi.%EXT%
+apidoc.%EXT%
+apidocs.%EXT%
 events.%EXT%
-event.jhtml
 email.%EXT%
 comments.%EXT%
 cassette.axd

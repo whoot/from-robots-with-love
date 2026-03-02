@@ -98,10 +98,10 @@ for f in "${robots_files[@]}"; do
       /\.(png|jpe?g|gif|bmp|svg|ico|webp|pif)$/Id
       /\.(woff2?|ttf|otf|eot|swf|tiff?|tex)$/Id
       /\.(map|s?css)$/Id
-      /\.(mp3|mp4|avi|mov|mkv|wav|webm|ogg|flac|mpeg|mpg|flv)$/Id
+      /\.(mp3|mp4|aac|avif?|mov|mkv|wav|webm|ogg|flac|mpeg|mpg|flv)$/Id
       /\.(pdf|doc|docx|xls|xlsx|ppt|pptx)$/Id
       /\.(m?js|rb|java|vue|py(thon)?|dll|pl|egg|mo|po|cs|resx|ascx)$/Id
-      /\.(class|com|exe|ram|scr|snp)$/Id
+      /\.(class|com|exe|ram|scr|snp|ajax)$/Id
       /^[^.]/ s/\.(html?|php|phtml|as(px|hx|mx|p)|jspx?|cgi|cfm)$/\.%EXT%/I
     ' \
   | sort -u \
