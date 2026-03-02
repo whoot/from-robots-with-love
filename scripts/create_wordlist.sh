@@ -1,4 +1,3 @@
-#!/bin/bash
 #!/usr/bin/env bash
 set -eu
 
@@ -12,8 +11,7 @@ ROBOTS_DIR="./robots"
 BADWORDS="./badwords/badwords.txt"
 EXACT_BADWORDS="./badwords/exact_badwords.txt"
 WORKING_DIR="./working"
-TEMP=$(mktemp)
-MIN_COUNT=4
+MIN_COUNT=10
 
 # ---------------------------------------------------------------------------
 # Preflight checks
@@ -76,6 +74,7 @@ for f in "${robots_files[@]}"; do
   draw_progress "$i" "$total"
 
   domain="$(basename "$f" .txt)"
+  escaped_domain="${domain//./\\.}"
   outfile="$PARSED_DIR/${domain}.txt"
 
 # Extract Allow/Disallow paths from all robots.txt files
@@ -87,12 +86,13 @@ for f in "${robots_files[@]}"; do
       s/\?.*//              # Remove query strings
       /\*/d                 # Remove lines with asterisks
       s/\$+$//              # Remove $ anchors
-      /$domain/d            # Remove domain lines
       /-$/d                 # Remove lines ending with minus
       /^([a-zA-Z]|[0-9])$/d # Remove lines with just one character
+      /^([0-9][0-9])$/d     # Remove lines with two numbers
   ' \
   | grep -P '^[A-Za-z0-9/._~-]+$' \
   | awk 'BEGIN{IGNORECASE=0} /^[[:upper:]][^[:upper:]]*$/ {print tolower($0); next} {print}' \
+  | sed -E "/$escaped_domain/d" \
   | grep -v '^\s*$' \
   | sed -E '
       /\.(png|jpe?g|gif|bmp|svg|ico|webp|pif)$/Id
@@ -121,7 +121,7 @@ cat "$PARSED_DIR"/*.txt \
   | sort \
   | uniq -c \
   | sort -nr \
-  | awk '$1 >= 10' \
+  | awk -v min="$MIN_COUNT" '$1 >= min' \
   > "$UNFILTERED"
 
 TOTAL_RAW=$(wc -l < "$UNFILTERED")
@@ -163,7 +163,7 @@ sed -E 's/^[[:space:]]*[0-9]+[[:space:]]+//' "./all_counted.txt" > "./dirsearch-
 grep -E '.\.[a-zA-Z0-9%]{2,}$' ./dirsearch-robots.txt \
   > "./burp-robots-files.txt"
 
-grep -Fxv -f ./burp-robots-files.txt .dirsearch-robots.txt \
+grep -Fxv -f ./burp-robots-files.txt ./dirsearch-robots.txt \
   > "./burp-robots-directories.txt"
 
 TOTAL_ENTRIES=$(wc -l < "./dirsearch-robots.txt")
@@ -171,11 +171,12 @@ FILES_COUNT=$(wc -l < "./burp-robots-files.txt")
 DIRS_COUNT=$(wc -l < "./burp-robots-directories.txt")
 
 rm -rf "$WORKING_DIR/"
+rm -f "$UNFILTERED"
 
 # ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
-FINAL=$(wc -l < "$OUTPUT")
+
 echo ""
 echo "=== Done ==="
 echo "  dirsearch-robots.txt         - combined list ($TOTAL_ENTRIES entries)"
