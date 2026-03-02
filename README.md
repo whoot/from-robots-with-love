@@ -60,10 +60,14 @@ In pentests, a common question is: *Which wordlist should I use for content disc
 
 For many testers, the go-to choice is [SecLists / Discovery / Web-Content](https://github.com/danielmiessler/SecLists/tree/master/Discovery/Web-Content). However, many of those wordlists come with practical limitations:
 
-- **Outdated coverage** - some lists are 3-9 years old and don't reflect modern applications and technologies.
-- **Redundant extensions** - entries like `file.php`, `file.html`, `file.json` test the same path with every extension, most of which won't exist on the target.
-- **Overlap between lists** - the same paths appear across multiple wordlists, leading to duplicate requests.
-- **Noisy entries** - static assets (e.g. JavaScript files) and questionable entries (looking at you, `raft-*.txt`) add bulk without value.
+- **Outdated coverage** \
+  Some lists are up to 9 years old and don't reflect modern applications and technologies.
+- **Redundant extensions** \
+  Entries like `file.php`, `file.html`, `file.json` test the same resource with multiple extensions, many of which may not exist due to the target’s technology stack, unnecessarily increasing scan time.
+- **Overlap between lists** \
+  The same entries appear across multiple wordlists, leading to duplicate requests.
+- **Noisy entries** \
+  Static assets (e.g. JavaScript files) and questionable entries (looking at you, `raft-*.txt`) add bulk without value.
 
 The result is unnecessary requests, increased brute-force time, and less focused testing.
 
@@ -72,9 +76,10 @@ The result is unnecessary requests, increased brute-force time, and less focused
 This project aims to create a universal and (relatively) compact wordlist that captures the most common directories and files while leveraging dirsearch's built-in features.
 
 1. Crawl `/robots.txt` from the top 100,000 most visited domains.
-2. Extract and clean paths from `Disallow`/`Allow` directives.
+2. Extract and clean paths from `Disallow`/`Allow`/`Noindex` directives.
 3. Remove noise (see below).
 4. Sort entries by frequency of occurrence across domains.
+5. Keep only entries that occur at least 10 times overall.
 
 ### Filtering
 
