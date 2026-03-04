@@ -78,7 +78,7 @@ for f in "${robots_files[@]}"; do
   outfile="$PARSED_DIR/${domain}.txt"
 
 # Extract Allow/Disallow paths from all robots.txt files
-  grep -hEi '^\s*((Dis)?Allow:|Noindex:)\s' "$f" \
+  grep -ahEi '^\s*((Dis)?Allow:|Noindex:)\s' "$f" \
   | sed -E 's/^\s*((Dis)?Allow:|Noindex:)\s*//i' \
   | tr '/' '\n' \
   | sed -E '
@@ -117,7 +117,8 @@ echo ""
 echo "=== Step 2: Aggregating entries ==="
 
 UNFILTERED=$(mktemp)
-cat "$PARSED_DIR"/*.txt \
+find "$PARSED_DIR" -type f -name '*.txt' -print0 \
+  | xargs -0 cat
   | sort \
   | uniq -c \
   | sort -nr \
