@@ -15,6 +15,7 @@ import gzip
 import io
 import re
 import sys
+import time
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
